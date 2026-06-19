@@ -1,153 +1,102 @@
--- ============================================================
--- ROBINHO · MINERVA FOODS — Schema Supabase
--- Execute no SQL Editor do Supabase
--- ============================================================
+/* ============================================================
+   ROBINHO · MINERVA FOODS — Global Styles v1.7
+   Glassmorphism + Skeuomorphism
+   ============================================================ */
 
--- Habilitar extensão para UUID
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
--- ============================================================
--- TABELA: processos
--- Armazena cada processo seletivo configurado
--- ============================================================
-CREATE TABLE IF NOT EXISTS processos (
-  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  nome          TEXT NOT NULL,
-  responsavel   TEXT NOT NULL DEFAULT 'Robson Ramos',
-  cargo_buscado TEXT,
-  descritivo    TEXT,
-  sensibilidade TEXT DEFAULT 'normal' CHECK (sensibilidade IN ('strict','normal','flex')),
-  limiar_aprovado   INTEGER DEFAULT 70,
-  limiar_potencial  INTEGER DEFAULT 40,
-  pesos         JSONB DEFAULT '{"d1":20,"d2":10,"d3":15,"d4":10,"d5":10,"d8":15,"d9":10,"d10":10}',
-  config        JSONB DEFAULT '{}',
-  status        TEXT DEFAULT 'ativo' CHECK (status IN ('ativo','pausado','encerrado')),
-  idioma        TEXT DEFAULT 'pt' CHECK (idioma IN ('pt','en','es')),
-  created_at    TIMESTAMPTZ DEFAULT NOW(),
-  updated_at    TIMESTAMPTZ DEFAULT NOW()
-);
+:root {
+  --red: #C41E3A;
+  --red-dark: #8B1325;
+  --red-light: #E8374F;
+  --gold: #C9A84C;
+  --gold-light: #E8C97E;
+  --dark: #0A0A0F;
+  --dark2: #12121A;
+  --dark3: #1A1A26;
+  --dark4: #22223A;
+  --text: #F0EEE8;
+  --text-muted: rgba(240,238,232,0.55);
+  --text-dim: rgba(240,238,232,0.3);
+  --surface: rgba(255,255,255,0.06);
+  --surface2: rgba(255,255,255,0.10);
+  --border: rgba(255,255,255,0.12);
+  --border2: rgba(201,168,76,0.3);
+  --green: #2ECC71;
+  --orange: #E67E22;
+  --blue: #3498DB;
+  --glass-bg: rgba(255,255,255,0.09);
+  --glass-border: rgba(255,255,255,0.18);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.22);
+  --radius: 12px;
+  --radius-lg: 16px;
+  --font: 'Inter', -apple-system, sans-serif;
+}
 
--- ============================================================
--- TABELA: triagens
--- Cada execução de triagem vinculada a um processo
--- ============================================================
-CREATE TABLE IF NOT EXISTS triagens (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  processo_id UUID REFERENCES processos(id) ON DELETE CASCADE,
-  nome        TEXT NOT NULL,
-  total       INTEGER DEFAULT 0,
-  aprovados   INTEGER DEFAULT 0,
-  potenciais  INTEGER DEFAULT 0,
-  reprovados  INTEGER DEFAULT 0,
-  score_medio NUMERIC(5,2) DEFAULT 0,
-  mapeamento  JSONB DEFAULT '{}',
-  created_at  TIMESTAMPTZ DEFAULT NOW()
-);
+html, body {
+  font-family: var(--font);
+  background: var(--dark);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(196,30,58,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(201,168,76,0.07) 0%, transparent 50%);
+  background-attachment: fixed;
+}
 
--- ============================================================
--- TABELA: candidatos
--- Cada candidato avaliado, vinculado a uma triagem
--- ============================================================
-CREATE TABLE IF NOT EXISTS candidatos (
-  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  triagem_id   UUID REFERENCES triagens(id) ON DELETE CASCADE,
-  processo_id  UUID REFERENCES processos(id) ON DELETE CASCADE,
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb { background: var(--red); border-radius: 2px; }
 
-  -- Dados pessoais
-  nome         TEXT,
-  telefone     TEXT,
-  email        TEXT,
-  linkedin_url TEXT,
-  cidade       TEXT,
-  estado       TEXT,
+/* Glass utility */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+}
 
-  -- Dados profissionais
-  cargo_atual    TEXT,
-  empresa_atual  TEXT,
-  experiencias   TEXT,
-  formacao       TEXT,
-  idiomas        TEXT,
-  salario_pret   NUMERIC(10,2),
+/* Skeu utility */
+.skeu {
+  background: linear-gradient(145deg, #1e1e2e, #16162a);
+  border: 0.5px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    inset 0 -1px 0 rgba(0,0,0,0.3),
+    0 4px 16px rgba(0,0,0,0.4);
+}
 
-  -- Scores por dimensão
-  score_d1   NUMERIC(5,2) DEFAULT 0,  -- Aderência descritivo
-  score_d2   NUMERIC(5,2) DEFAULT 0,  -- LinkedIn
-  score_d3   NUMERIC(5,2) DEFAULT 0,  -- Tempo na posição
-  score_d4   NUMERIC(5,2) DEFAULT 0,  -- Liderança
-  score_d5   NUMERIC(5,2) DEFAULT 0,  -- Formação
-  score_d8   NUMERIC(5,2) DEFAULT 0,  -- Indústria carne
-  score_d9   NUMERIC(5,2) DEFAULT 0,  -- Idiomas
-  score_d10  NUMERIC(5,2) DEFAULT 0,  -- Localização
-  score_custom JSONB DEFAULT '{}',
+/* Form base */
+input, select, textarea {
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 13px;
+  width: 100%;
+  transition: border-color .18s, background .18s;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--gold);
+  background: rgba(255,255,255,0.09);
+}
+input::placeholder, textarea::placeholder { color: var(--text-dim); }
+select { appearance: none; cursor: pointer; }
+textarea { resize: vertical; line-height: 1.6; }
 
-  -- Score final e classificação
-  score_total   NUMERIC(5,2) DEFAULT 0,
-  classificacao TEXT DEFAULT 'pendente' CHECK (classificacao IN ('aprovado','potencial','reprovado','pendente')),
-  destaque      BOOLEAN DEFAULT FALSE,
-  detalhes      JSONB DEFAULT '{}',
+/* Animations */
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  -- Comunicação
-  wpp_enviado   BOOLEAN DEFAULT FALSE,
-  wpp_enviado_at TIMESTAMPTZ,
-
-  -- Dados brutos originais
-  dados_brutos  JSONB DEFAULT '{}',
-
-  created_at    TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ============================================================
--- TABELA: configs_globais
--- Configurações persistidas por usuário/equipe
--- ============================================================
-CREATE TABLE IF NOT EXISTS configs_globais (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  chave      TEXT UNIQUE NOT NULL,
-  valor      JSONB,
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ============================================================
--- ÍNDICES para performance
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_candidatos_triagem    ON candidatos(triagem_id);
-CREATE INDEX IF NOT EXISTS idx_candidatos_processo   ON candidatos(processo_id);
-CREATE INDEX IF NOT EXISTS idx_candidatos_score      ON candidatos(score_total DESC);
-CREATE INDEX IF NOT EXISTS idx_candidatos_classe     ON candidatos(classificacao);
-CREATE INDEX IF NOT EXISTS idx_triagens_processo     ON triagens(processo_id);
-
--- ============================================================
--- TRIGGER: atualiza updated_at automaticamente
--- ============================================================
-CREATE OR REPLACE FUNCTION update_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_processos_updated
-  BEFORE UPDATE ON processos
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
-
--- ============================================================
--- RLS (Row Level Security) — desativado para MVP
--- Ativar quando tiver autenticação por equipe
--- ============================================================
-ALTER TABLE processos    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE triagens     ENABLE ROW LEVEL SECURITY;
-ALTER TABLE candidatos   ENABLE ROW LEVEL SECURITY;
-ALTER TABLE configs_globais ENABLE ROW LEVEL SECURITY;
-
--- Política pública para MVP (ajustar para produção com auth)
-CREATE POLICY "public_all" ON processos    FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "public_all" ON triagens     FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "public_all" ON candidatos   FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "public_all" ON configs_globais FOR ALL USING (true) WITH CHECK (true);
-
--- ============================================================
--- DADOS INICIAIS
--- ============================================================
-INSERT INTO configs_globais (chave, valor) VALUES
-  ('idioma_padrao', '"pt"'),
-  ('version', '"1.7.0"'),
-  ('gupy_integration', 'false')
-ON CONFLICT (chave) DO NOTHING;
+.fade-in { animation: fadeIn .25s ease; }
+.pulse { animation: pulse 1.8s infinite; }

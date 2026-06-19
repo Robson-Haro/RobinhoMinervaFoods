@@ -1,68 +1,127 @@
-import { createClient } from '@supabase/supabase-js'
-
-const url  = import.meta.env.VITE_SUPABASE_URL  as string
-const key  = import.meta.env.VITE_SUPABASE_ANON_KEY as string
-
-if (!url || !key) {
-  console.warn('[Robinho] Supabase não configurado. Operando em modo offline.')
-}
-
-export const supabase = createClient(url || '', key || '')
-
-// ── Tipos utilitários ───────────────────────────────────────
-export type Processo = {
-  id: string
-  nome: string
-  responsavel: string
-  cargo_buscado: string
-  descritivo: string
-  sensibilidade: 'strict' | 'normal' | 'flex'
-  limiar_aprovado: number
-  limiar_potencial: number
-  pesos: Record<string, number>
-  config: Record<string, unknown>
-  status: 'ativo' | 'pausado' | 'encerrado'
-  idioma: 'pt' | 'en' | 'es'
-  created_at: string
-}
-
-export type Candidato = {
-  id: string
-  triagem_id: string
-  processo_id: string
-  nome: string
-  telefone: string
-  email: string
-  linkedin_url: string
-  cidade: string
-  estado: string
-  cargo_atual: string
-  empresa_atual: string
-  experiencias: string
-  formacao: string
-  idiomas: string
-  salario_pret: number | null
-  score_d1: number; score_d2: number; score_d3: number; score_d4: number
-  score_d5: number; score_d8: number; score_d9: number; score_d10: number
-  score_custom: Record<string, number>
-  score_total: number
-  classificacao: 'aprovado' | 'potencial' | 'reprovado' | 'pendente'
-  destaque: boolean
-  detalhes: Record<string, unknown>
-  wpp_enviado: boolean
-  dados_brutos: Record<string, unknown>
-  created_at: string
-}
-
-export type Triagem = {
-  id: string
-  processo_id: string
-  nome: string
-  total: number
-  aprovados: number
-  potenciais: number
-  reprovados: number
-  score_medio: number
-  mapeamento: Record<string, string>
-  created_at: string
+export const es = {
+  translation: {
+    brand: 'Robinho',
+    subtitle: 'Motor de Selección Inteligente · Minerva Foods',
+    nav: {
+      dashboard: 'Panel',
+      params: 'Parámetros',
+      triagem: 'Selección CSV',
+      results: 'Resultados',
+      whatsapp: 'WhatsApp',
+      config: 'Configuración',
+    },
+    dashboard: {
+      title: 'Pipeline de Reclutamiento',
+      sub: 'Vista ejecutiva · Actualizado tras cada selección',
+      newTriagem: '+ Nueva Selección',
+      total: 'Total Evaluados',
+      aprovados: 'Aprobados',
+      potenciais: 'Potenciales',
+      reprovados: 'Rechazados',
+      scoreMedio: 'Puntuación Media',
+      funil: 'Embudo de Selección',
+      top5: 'Top 5 Candidatos',
+      noData: 'Ejecute una selección para ver datos aquí.',
+      gupy_badge: 'Integración Gupy — Próximamente',
+    },
+    params: {
+      title: 'Parámetros de Selección',
+      sub: 'Configure dimensiones, pesos y umbrales antes de iniciar',
+      processo: 'Nombre del Proceso',
+      responsavel: 'Responsable',
+      cargo: 'Cargo Buscado',
+      sensibilidade: 'Sensibilidad de Similitud',
+      sens_strict: 'Estricta — palabras exactas',
+      sens_normal: 'Normal — incluye variaciones',
+      sens_flex: 'Flexible — raíces y sinónimos',
+      descritivo: 'Descripción del Puesto',
+      descritivo_ph: 'Pegue aquí la descripción completa del puesto...',
+      analisar: 'Analizar y Propagar Términos',
+      limiar_ap: 'Puntaje Mínimo — Aprobado',
+      limiar_pot: 'Puntaje Mínimo — Potencial',
+      salvar: 'Guardar Configuración',
+      balancear: 'Auto-balancear a 100',
+      restaurar: 'Restaurar Valores Predeterminados',
+      testar: 'Ejecutar Prueba de Validación',
+      termos: 'Términos extraídos automáticamente',
+      peso: 'pts',
+    },
+    triagem: {
+      title: 'Selección de CVs via CSV',
+      sub: 'Carga → Mapeo → Análisis automático',
+      dropzone: 'Haga clic para seleccionar o arrastre la planilla',
+      dropzone_sub: 'Formatos: CSV, XLSX, XLSM, XLS · Máx. 50 MB',
+      mapeamento: 'Mapeo de Columnas',
+      colunas: 'columnas',
+      candidatos: 'candidatos',
+      iniciar: 'Iniciar Selección Inteligente',
+      processando: 'Procesando candidatos...',
+      step1: 'Config', step2: 'Carga', step3: 'Mapear', step4: 'Resultados',
+      col_nome: 'Nombre del Candidato',
+      col_tel: 'Teléfono / WhatsApp',
+      col_email: 'Correo Electrónico',
+      col_linkedin: 'URL de LinkedIn',
+      col_cargo: 'Cargo Actual',
+      col_empresa: 'Empresa Actual',
+      col_cidade: 'Ciudad',
+      col_exp: 'Historial de Experiencias',
+      col_form: 'Formación Académica',
+      col_idiomas: 'Idiomas',
+      col_salario: 'Pretensión Salarial',
+    },
+    results: {
+      title: 'Resultados de la Selección',
+      todos: 'Todos los candidatos',
+      aprovados: '✅ Aprobados',
+      potenciais: '⚡ Potenciales',
+      reprovados: '❌ Rechazados',
+      exportar: 'Exportar CSV',
+      rank: '#', nome: 'Nombre', score: 'Puntaje', classe: 'Clasificación',
+      destaque: '⭐', cargo: 'Cargo Actual', cidade: 'Ciudad',
+      telefone: 'Teléfono', linkedin: 'LinkedIn', acao: 'Acción',
+      classificacao: {
+        aprovado: '✅ Aprobado',
+        potencial: '⚡ Potencial',
+        reprovado: '❌ Rechazado',
+      },
+    },
+    whatsapp: {
+      title: 'WhatsApp Automático',
+      sub: 'Mensajes personalizados por clasificación',
+      msg_ap: 'Mensaje — Aprobado',
+      msg_pot: 'Mensaje — Potencial',
+      msg_rep: 'Mensaje — Rechazado',
+      preview: 'Vista previa',
+      disparar: 'Enviar Mensajes a Evaluados',
+      delay: 'Retraso entre envíos',
+      auto_ap: 'Enviar automáticamente a Aprobados',
+      auto_pot: 'Enviar automáticamente a Potenciales',
+      auto_rep: 'Enviar automáticamente a Rechazados',
+    },
+    config: {
+      title: 'Configuración & APIs',
+      sub: 'Integraciones y ajustes globales del sistema',
+      gupy_key: 'API Key — Gupy',
+      wpp_key: 'API Key — WhatsApp Business',
+      wpp_num: 'Número WhatsApp Origen',
+      testar: 'Probar',
+      versao: 'Versión',
+      ambiente: 'Entorno',
+      prod: 'Producción',
+      hom: 'Pruebas',
+      debug: 'Modo Debug',
+      historico: 'Guardar historial de selecciones',
+      idioma_sistema: 'Idioma del Sistema',
+    },
+    common: {
+      salvo: '✅ Configuración guardada con éxito!',
+      erro: '❌ Error al guardar. Verifique su conexión.',
+      auto: 'Auto',
+      nao_mapear: '— No mapear —',
+      mapear: '— Mapear tras carga —',
+      sim: 'Sí', nao: 'No',
+      exportado: '✅ CSV exportado!',
+      gupy_wip: 'Integración Gupy en desarrollo.',
+    }
+  }
 }
